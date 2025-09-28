@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="utf-8">
+    <title>Veterinaria MyNuvet</title>
+    <link rel="stylesheet" href="estilos.css">
+</head>
+<body>
+    <h2>Datos de Mascota</h2>
+    <div class="contenedor-formularios">
+        <form id="formMascota" autocomplete="off">
+            <label for="idmascota">ID Mascota</label>
+            <input type="number" name="idmascota" id="idmascota" placeholder="ID Mascota" required>
+            
+            <label for="nombreM">Nombre de la mascota</label>
+            <input type="text" name="nombreM" id="nombreM" placeholder="Nombre de la mascota" required>
+            
+            <label for="raza">Raza</label>
+            <input type="text" name="raza" id="raza" placeholder="Raza" required>
+            
+            <label for="numVacunas">Número de vacunas</label>
+            <input type="number" name="numVacunas" id="numVacunas" placeholder="Número de vacunas" required>
+            
+            <label for="peso">Peso (kg)</label>
+            <input type="number" name="peso" id="peso" placeholder="Peso en kg" required>
+            
+            <label for="cantComida">Cantidad de comida (g)</label>
+            <input type="number" name="cantComida" id="cantComida" placeholder="Cantidad en gramos" required>
+            
+            <button type="submit">Guardar Mascota</button>
+            <div id="mensajeMascota" aria-live="polite"></div>
+        </form>
+        
+        <form id="formCita" autocomplete="off">
+            <label for="idmascotaCita">ID Mascota</label>
+            <input type="number" name="idmascota" id="idmascotaCita" placeholder="ID Mascota" required>
+            
+            <label for="proxcita">Fecha y hora de la próxima cita</label>
+            <input type="datetime-local" name="proxcita" id="proxcita" required>
+            
+            <button type="submit">Agendar cita</button>
+            <div id="mensajeCita" aria-live="polite"></div>
+            
+            <h3>Próxima cita:</h3>
+            <p id="proximaCita"></p>
+        </form>
+    </div>
+    <script>
+    // Guardar Mascota
+    document.getElementById('formMascota').onsubmit = async function(e) {
+        e.preventDefault();
+        const formData = new FormData(this);
+        const mensajeMascota = document.getElementById('mensajeMascota');
+        try {
+            const response = await fetch('/guardar_mascota', {
+                method: 'POST',
+                body: new URLSearchParams(formData) // Para Express y urlencoded
+            });
+            const texto = await response.text();
+            mensajeMascota.textContent = texto;
+            mensajeMascota.style.color = texto.includes("correctamente") ? "#79c6b0" : "#d63031";
+            this.reset();
+        } catch (err) {
+            mensajeMascota.textContent = "Error al guardar la mascota.";
+            mensajeMascota.style.color = "#d63031";
+        }
+    }
+
+    // Agendar cita
+    document.getElementById('formCita').onsubmit = async function(e) {
+        e.preventDefault();
+        const formData = new FormData(this);
+        const mensajeCita = document.getElementById('mensajeCita');
+        try {
+            const response = await fetch('/agendar_cita', {
+                method: 'POST',
+                body: new URLSearchParams(formData)
+            });
+            const cita = await response.text();
+            document.getElementById('proximaCita').textContent = cita;
+            mensajeCita.textContent = "";
+            this.reset();
+        } catch (err) {
+            mensajeCita.textContent = "Error al agendar la cita.";
+            mensajeCita.style.color = "#d63031";
+        }
+    }
+    </script>
+</body>
+</html>
